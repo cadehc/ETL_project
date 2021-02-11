@@ -1,0 +1,126 @@
+ETL Argentina Database Project
+
+INTRODUCTION
+Our project consist of making a database from the following
+public website: 
+https://hidrocarburos.energianeuquen.gob.ar/portalgis/web/
+
+This website is used as a vehicle of information between the 
+local government of the Neuquen Province in Argentina and the 
+public. Entities working with these data are oil companies, 
+market analysts, economists and others working in the energy 
+sector.
+
+The data covers basic aspects of energy activities in the Neuquen
+Province. The information is provided as Geodatabases which contain
+various files. The files that we are using are .dbs files which 
+can be open by Excel. All the information is in Spanish but some 
+column labels have been translated to English to facilitate their 
+identification.
+
+Our objective is to build a database that contains infomation about 
+the hydrocarbon areas and the wells drilled in the Neuquen Province. 
+Information from these tables should be translated into a database 
+that can be queried retrieving information from either table or the 
+two tables combined.
+
+The information is originally contained in two separate integrated 
+tables (Areas and Wells) that have several columns. There are multiple
+entities that have been integrated to produce these tables. We will
+identify the various entities and create indexes to connect the entities.
+This process will reduce the size of the original database but also
+will make it a relational database.
+
+
+###File: AreaOperatorSimple
+    Describes the operators existing in the areas using the name of the
+    operator and an operator abbreviation. All the areas should have an
+    operator. One operator can be working in more than one area. This 
+    table relates to the Area_GISObject table by INDEX3
+
+###File: Areas_GISObjects
+    This is the main table for the hydrocarbon operation areas that have
+    been defined by the Neuquen Province. This table lists all the areas
+    by their name and also contains information about the object ID in the
+    provinces database map (which is a graphical file), the surface area,
+    in squared kilometers, the perimeter in kilometers, an index that
+    refers to the OperatorSimple table (PERATOR_INDEX3) and and index to
+    the contract type in each area (CONTRACT_INDEX2). This table has an 
+    index of its own as well which should help for expansions.
+
+###File: ContractSimple
+    This table shows the kinds of contracts that can exist in the various
+    areas. This table has an index that realtes to the Areas_GISObjects
+    INDEX(2)
+
+###File: AreaNumberObjNumber
+This table should allow joining the Areas table with the Wells Table 
+First Column: ID_NQN 
+    This column is present in the Main WellsSimpleIndexW.
+    This indicates in which area a well is located but the index is
+    its own. This index matches one to one with object gis in the
+    Areas Table
+Second Column: ID_BLOQUE
+    This column contains the sequential index of the areas as described
+    in the Areas_GISObjects table.
+
+File: Fields_Simple
+    This table is complex. The table contains the field name to which
+    each well has been assigned. One oil or gas field can contain one or
+    many wells. The complexity in this tables is that the field names that
+    we use are not exactly the same that existed in the original table. The
+    names had to be stripped of some numeric values and in some cases non-
+    english languaje characters
+
+File: Fluids_Simple
+    The table contains the categories for type of fluid that could be produced
+    by well. There are ten categories, each of which has an index that realtes
+    to the WellsSimpleIndexW table. Additional columns are the name of the 
+    fluid in English and the phase observed at the surface.A liquid fluid in 
+    subsurface may be produced as gas at the surface (e.g. water vapor)
+
+File: ResourceSimple
+    This table classifies the type of resources by categories that are used in
+    modern times. In the past all resources were conventionals but now we have
+    unconventional resources that require fracking. There are four categories
+    abbreviations, each with its index, and we have included the name of the
+    resource, what type of sealing mechanism is present, the trapping mechanism,
+    and the typical porosity observed for each resource type.
+
+File: Rock_Simple
+    This table summarizes the rock formations targetted for each well. Not all
+    formations produce everywhere in the territory. The rock formations have been
+    described by an abbreviation, the type of resource typical of each formations
+    the relative commercial importance (present or future), and how much of the
+    province is covered by each rock formation (in percentaje).
+    The index ID (FM_ID) which relates to the wells via an index of the same name.
+
+File: WellsSimpleIndexP
+    This is the most important table in the dataset. The index for the table is
+    wid and gicves a number to each well. The wells are named by the Neuquen Province
+    as unique items, otherwise a lot of problems can happen. This table also 
+    contains the well names as a string, the short name that is used in maps, the
+    elevation (of the well head, above sea level), the total depth of the well, an
+    id that relates to the hydrocarbon areas defined by the government, the location
+    of the well expresed as latitude and longitude, and after that a series of
+    indexes that relate to the other entities described elsewhere in this report.
+        f_id is the oil/gas field index
+        rid is the index to the type of resource targetted by the well
+        geometry_id is the index to the orientation of the well with respect to 
+                    vertical direction (horizontal wells are ~90 degress to vertical)
+        op_id is the operator of the well (which sometimes is not the operator of
+            the hydrocarbon area)
+        st_id is the status of the well
+        fm_id is the rock formation targetted by the well
+
+
+FileStatus_Simple
+    This table explains the nomenclature used to say if a well is active (Activo)
+    and producing some fluid and has an index that relates to the WellsSimpleIndexP
+
+
+
+
+
+
+
